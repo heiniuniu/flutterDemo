@@ -8,11 +8,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
 //    final wordPair=new WordPair.random();
     return new MaterialApp(
-        title: 'pengleigang',
-        home: new RandomWords(),
+      title: 'pengleigang',
+      home: new RandomWords(),
+      theme: new ThemeData(
+        primaryColor: Colors.white,
+      ),
     );
   }
 }
+
 class RandomWords extends StatefulWidget {
   @override
   createState() => new RandomWordsState();
@@ -27,11 +31,44 @@ class RandomWordsState extends State<RandomWords> {
   Widget build(BuildContext context) {
 //    final wordPair = new WordPair.random();
 //    return new Text(wordPair.asPascalCase);
-    return new Scaffold (
+    return new Scaffold(
       appBar: new AppBar(
         title: new Text('Startup Name Generator'),
+        actions: <Widget>[
+          new IconButton(icon: new Icon(Icons.list), onPressed: _pushSaved),
+        ],
       ),
       body: _buildSuggestions(),
+    );
+  }
+
+  void _pushSaved() {
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context) {
+          final tiles = _selected.map(
+            (pair) {
+              return new ListTile(
+                title: new Text(
+                  pair.asPascalCase,
+                  style: _fontSize,
+                ),
+              );
+            },
+          );
+          final divided = ListTile.divideTiles(
+            context: context,
+            tiles: tiles,
+          ).toList();
+
+          return new Scaffold(
+            appBar: new AppBar(
+              title: new Text('Saved Suggestions'),
+            ),
+            body: new ListView(children: divided),
+          );
+        },
+      ),
     );
   }
 
@@ -55,12 +92,11 @@ class RandomWordsState extends State<RandomWords> {
             _suggestions.addAll(generateWordPairs().take(10));
           }
           return _buildRow(_suggestions[index]);
-        }
-    );
+        });
   }
 
-  Widget _buildRow(WordPair pair){
-    final alreadySaved = _selected.contains(pair);//是否已经收藏了
+  Widget _buildRow(WordPair pair) {
+    final alreadySaved = _selected.contains(pair); //是否已经收藏了
     return new ListTile(
       title: new Text(
         pair.asPascalCase,
